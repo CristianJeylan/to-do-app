@@ -10,19 +10,18 @@ const SignIn = ({setShowModal, showModal}) => {
       password: '',
       confirmPassword: ''
     })
-  const id = crypto.randomUUID()
   const [error, setError] = useState(false)
 
   const handleChange = e => {
     const {name, value} = e.target
-    setUser({...user, [name]: value, id: id})
+    setUser({...user, [name]: value})
   }
 
     const handleSubmit = e => {
     e.preventDefault();
 
     if(Object.values(user).includes('')) {
-      setError(!error)
+      setError(true)
     }else {
       setError(error === true ? setError(!error) : error)
       setUser({
