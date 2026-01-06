@@ -30,7 +30,7 @@ export const ToDo = () => {
   };
 
   if (loading) return <p>Cargando...</p>;
-  if (!user) return <Navigate to="/login" />;
+  if (!user) return <Navigate to="/auth" />;
 
   return (
     <div>

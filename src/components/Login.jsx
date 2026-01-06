@@ -1,19 +1,19 @@
 import { useState } from "react"
 import Error from "./Error"
+import SignIn from "./SignIn"
+import Button from "./Button"
 
-const Login = () => {
+const Login = ({showModal, setShowModal}) => {
 
   const [user, setUser] = useState({
     username: '',
     password: ''
   })
-  const [users, setUsers] = useState([])
   const [error, setError] = useState(false)
-  const id = crypto.randomUUID()
 
   const handleChange = e => {
     const {name, value} = e.target
-    setUser({...user, [name]: value, id: id})
+    setUser({...user, [name]: value})
   }
 
   const handleSubmit = e => {
@@ -23,24 +23,43 @@ const Login = () => {
       setError(!error)
     } else {
       setError(error === true ? setError(!error) : error)
-      setUsers([...users, user])
       setUser({
-        username: '',
+        email: '',
         password: ''
       })
     }
   }
 
+
+  const handleClick = () => {
+    setShowModal(!showModal)
+  }
+
   return (
-    <div className="flex flex-col gap-1.5 bg-white p-5 rounded-md shadow-lg w-100">
-        {error && <Error/>}
+    <div className={`${showModal && "hidden"} flex flex-col gap-1.5 bg-white p-6 rounded-lg shadow-lg w-100`}>
+      {error && <Error><p>Todos los campos son obligatorios</p></Error>}
         <h1 className="font-bold text-3xl text-center mb-2">Welcome Back!</h1>
         <form onSubmit={handleSubmit} action="" className="flex flex-col gap-4">
-            <input onChange={handleChange} name="username" value={user.username} type="text" placeholder="Username" className="border p-2 rounded-lg placeholder:text-gray-500 font-semibold"/>
-            <input onChange={handleChange} name="password" value={user.password} type="password" placeholder="Password" className="border p-2 rounded-lg placeholder:text-gray-500 font-semibold"/>
+            <input onChange={handleChange} name="username" value={user.email} type="text" placeholder="Email" className="border p-2 rounded-lg placeholder:text-gray-400 font-semibold"/>
+            <input onChange={handleChange} name="password" value={user.password} type="password" placeholder="Password" className="border p-2 rounded-lg placeholder:text-gray-400 font-semibold"/>
             <button type="submit" className=" w-40 self-center p-2 rounded-xl bg-purple-700 text-center text-white font-bold hover:bg-purple-600 cursor-pointer transition-all">Log In</button>
         </form>
-        <p className="text-center text-sm text-gray-500 mt-2">Forgot Password? Create Account</p>
+        <p onClick={handleClick} className="text-center text-sm text-gray-500 mt-2">Forgot Password?{" "}<span className="hover:text-purple-600 cursor-pointer">Create Account</span></p>
+        <div className="self-center">
+          {
+          <Button>
+            <button className="font-semibold text-center p-2 border-2 mt-5 hover:cursor-pointer transition-all">
+              Sign up with{" "}
+              <span className="hover:text-blue-700 transition-all">G</span>
+              <span className="hover:text-red-700 transition-all">o</span>
+              <span className="hover:text-yellow-300 transition-all">o</span>
+              <span className="hover:text-red-700 transition-all">g</span>
+              <span className="hover:text-blue-700 transition-all">l</span>
+              <span className="hover:text-green-700 transition-all">e</span>
+            </button>
+          </Button>
+          }
+        </div>
     </div>
   )
 }
