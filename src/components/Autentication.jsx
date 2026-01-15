@@ -8,9 +8,9 @@ const Autentication = () => {
     
   return (
     <div>
-      <Login setShowModal={setShowModal} showModal={showModal}/>
+      <Login setShowModal={setShowModal} showModal={showModal} />
         {showModal && (
-          <SignIn setShowModal={setShowModal} showModal={showModal}/>
+          <SignIn setShowModal={setShowModal} showModal={showModal} />
         )}
     </div>
   )

@@ -1,9 +1,9 @@
 import {Routes, Route} from "react-router-dom"
-import './App.css'
 import Autentication from './components/Autentication'
 import { ToDo } from './components/contents/ToDo'
 
 function App() {
+
   return (
     <div className='h-screen flex justify-center items-center bg-gray-300'>
       <Routes>
