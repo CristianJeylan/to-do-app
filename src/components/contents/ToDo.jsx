@@ -5,11 +5,14 @@ import { auth } from "../../api/firebase";
 import Task from "./components/Task";
 import Button from "../Button";
 import ListTasks from "./components/ListTasks";
+import Settings from "./components/Settings";
+import NewTask from "./components/NewTask";
 
 export const ToDo = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [showModal, setShowModal] = useState(false)
+  const [showSettings, setShowSettings] = useState(false)
+  const [showNewTask, setShowNewTask] = useState(false)
 
   //temporal
   useEffect(()=>{
@@ -29,15 +32,45 @@ export const ToDo = () => {
     return () => unsubscribe();
   }, [auth]);
 
-  const onClick = async () => {
-    await LogOutService();
+  const handleLogout = async () => {
+    let salir = confirm("Seguro que desea cerrar seccion")
+    salir ? await LogOutService() : alert("no cerro seccion")
   };
 
   if (loading) return <p>Cargando...</p>;
   if (!user) return <Navigate to="/auth" />;
-  console.log(user)
+
+  const handleSettings = () => {
+    setShowSettings(!showSettings)
+  }
+
+  const handleShowNewTask = () => {
+    setShowNewTask(!showNewTask)
+  }
 
   const Fecha = new Date()
+
+  function reloj() {
+    let horas = Fecha.getHours();
+    let miuntos = Fecha.getMinutes();
+    const ampm = horas >= 12 ? "PM" : "AM"
+
+    let hora12 = horas % 12
+    hora12 = hora12 ? hora12 : 12
+
+    horas < 10 ? "0" + horas : horas
+    miuntos < 10 ? "0" + miuntos : miuntos
+
+    const formato24 = `${horas}:${miuntos}`
+    const formato12 = `${hora12}:${miuntos} ${ampm}`
+
+    return [formato12, formato24]
+
+  }
+
+  setInterval(reloj, 60000)
+
+  const [formato12, formato24] = reloj()
 
   const diasSemana = [
   'Domingo', 'Lunes', 'Martes', 'Miércoles', 
@@ -50,56 +83,74 @@ export const ToDo = () => {
   ];
 
   return (
-    <div className="h-screen w-full bg-gray-200">
-      <main className={`${showModal && "blur-sm"} flex gap-x-2.5 overflow-hidden`}>
-        <section className="md:w-3/5 flex flex-col p-5">
-          <header className=" mb-12">
-            <h1 className="text-5xl font-bold">Hola{" "+ user.displayName + " "}👋</h1>
-            <p className="font-semibold text-lg">{`${diasSemana[Fecha.getDay()]}, ${meses[Fecha.getMonth()]}  ${Fecha.getDate()}`}</p>
-          </header>
-          <ListTasks/>
-        </section>
-        <section className="md:w-2/5 flex flex-col h-screen justify-between items-end p-6 border">
-          <div className="w-30 h-30 border-green-500 border-6 rounded-full flex flex-col justify-center items-center">
-            <span className="font-bold">3/8 tasks</span>
-            <span className="text-gray-400 text-sm">completed</span>
+    <div className="h-screen w-full">
+      <main className={`${showSettings && "blur-sm"} ${showNewTask && "blur-sm"} h-full w-full bg-gray-200 flex`}>
+        <section className="md:w-1/7 bg-white flex flex-col">
+        <div className="flex items-center gap-2 p-3">
+          <img src="" alt="imgUSER" className="w-12 h-12 rounded-full border bg-blue-500"/>
+          <div className="flex flex-col">
+            <p className="font-semibold">{user.displayName}</p>
+            <span className="text-sm text-gray-500">Basic Plan</span>
           </div>
-          <Button>
-            <button onClick={() => setShowModal(!showModal)} className={`py-3 px-5 rounded-full bg-purple-600 font-semibold text-white text-center text-3xl hover:bg-purple-500 cursor-pointer transition-all`}>+</button>
-          </Button>
+        </div>
+        <div className="flex-1 flex flex-col bg-white p-3 justify-between">
+          <div className="flex flex-col gap-2">
+            <button className="text-left p-2 rounded-md hover:cursor-pointer transition-all focus:text-blue-500 focus:bg-blue-100 text-sm font-semibold text-gray-800">My day</button>
+            <button className="text-left p-2 rounded-md hover:cursor-pointer transition-all focus:text-blue-500 focus:bg-blue-100 text-sm font-semibold text-gray-800">Important</button>
+            <button className="text-left p-2 rounded-md hover:cursor-pointer transition-all focus:text-blue-500 focus:bg-blue-100 text-sm font-semibold text-gray-800">Planned</button>
+            <button className="text-left p-2 rounded-md hover:cursor-pointer transition-all focus:text-blue-500 focus:bg-blue-100 text-sm font-semibold text-gray-800">Projects</button>
+          </div>
+          <div>
+            <form action="" className="flex flex-col gap-3">
+              <label htmlFor="darkMode" className="flex justify-between text-sm font-semibold text-gray-800">⏾ Dark Mode
+                <input type="checkbox" name="darkMode" id="darkMode" />
+              </label>
+              <button onClick={handleLogout} className="bg-blue-500 text-center p-2 text-white rounded-md hover:cursor-pointer hover:bg-blue-600 transition-all">Logout</button>
+            </form>
+          </div>
+        </div>
+        </section>
+        <section className="md:w-6/7 px-6 py-3 flex flex-col">
+        <div className="flex flex-col gap-2">
+          <div className="flex justify-between">
+            <header className="flex flex-col gap-0.5">
+              <h1 className="font-black text-3xl">Good Morning, {" " + user.displayName}</h1>
+              <p className="font-semibold text-sm text-gray-700">{`${diasSemana[Fecha.getDay()]}, ${meses[Fecha.getMonth()]}  ${Fecha.getDate()}`} | {formato24}</p>
+            </header>
+            <button onClick={handleSettings} className={`${showSettings && "hidden"} ${showNewTask && "hidden"} text-2xl self-end scale-90 hover:scale-none cursor-pointer transition-all`}>⚙</button>
+          </div>
+          <div className="flex gap-4 mt-3">
+            <div className="bg-blue-500 flex-1 rounded-md p-3 shadow-md">
+              <div className="flex justify-between">
+                <p className="text-white text-sm">Total tasks</p>
+                <span>📋</span>
+              </div>
+              <span className="text-2xl text-white font-semibold">{0}</span>
+            </div>
+            <div className="bg-white flex-1 rounded-md p-3 shadow-md">
+              <div className="flex justify-between">
+                <p className="text-sm text-gray-600">Completed</p>
+                <span>✅</span>
+              </div>
+              <span className="text-2xl font-semibold">{0}</span>
+            </div>
+            <div className="bg-white flex-1 rounded-md p-3 shadow-md">
+              <div className="flex justify-between">
+                <p className="text-sm text-gray-600">Pending</p>
+                <span>⏰</span>
+              </div>
+              <span className="text-2xl font-semibold">{0}</span>
+            </div>
+          </div>
+        </div>
+        <div>
+          <ListTasks/>
+        </div>
+        <button onClick={handleShowNewTask} className={`${showNewTask && "hidden"} ${showSettings && "hidden"} absolute bottom-6 right-6 bg-blue-500 hover:bg-blue-600 hover:cursor-pointer px-3 py-1.5 transition-all text-center font-semibold text-white rounded-md`}>Add Task</button>
         </section>
       </main>
-      {showModal && (
-        <div className="bg-white h-100 w-100 absolute inset-0 m-auto rounded-lg p-2">
-          <h2 className="text-2xl font-bold">Create New Task</h2>
-          <form onSubmit={handleSubmit} action="" className="flex flex-col gap-2">
-            <input type="text" placeholder="Task name" className="mt-1.5 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"/>
-            <div className="flex justify-around">
-              <div className="h-20 w-20 bg-red-500"></div>
-              <div className="h-20 w-20 bg-red-500"></div>
-            </div>
-            <div className="flex flex-col gap-4">
-              <h5 className="font-bold text-lg">Priority</h5>
-              <div className="flex justify-around">
-                <label htmlFor="High" className="flex items-center justify-center gap-5">
-                  <input type="checkbox" name="High" id="High" className="h-5 w-5"/>High
-                </label>
-                <label htmlFor="Medium" className="flex items-center justify-center  gap-5">
-                  <input type="checkbox" name="Medium" id="Medium" className="h-5 w-5"/>Medium
-                </label>
-                <label htmlFor="Low" className="flex items-center justify-center gap-5">
-                  <input type="checkbox" name="Low" id="Low" className="h-5 w-5"/>Low
-                </label>
-              </div>
-              <div className="flex justify-around">
-                <button onClick={() => {setShowModal(false)}} className="bg-gray-500 py-2 px-8 text-center rounded-sm font-semibold hover:bg-gray-600 cursor-pointer transition-all">Cancel</button>
-                <button className="bg-purple-600 py-2 px-8 text-center rounded-sm font-semibold text-white hover:bg-purple-500 cursor-pointer transition-all">Create Task</button>
-              </div>
-            </div>
-          </form>
-        </div>
-      )}
-      {/* <button onClick={onClick}>cerrar sesion</button> */}
+      {showSettings && <Settings handleSettings = {handleSettings}/>}
+      {showNewTask && <NewTask handleShowNewTask = {handleShowNewTask}/>}
     </div>
   );
 };
